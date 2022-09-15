@@ -46,6 +46,8 @@ start=time.time()
 
 change_status=True
 cnt=0
+blur_pic_count=0
+unblurred_pic_count=0
 while True:
     end=time.time()
 
@@ -56,6 +58,9 @@ while True:
 
     w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    
+    cv2.rectangle(frame,(0,h-30),(w,h),(0,0,0),-1)
+    cv2.rectangle(frame,(0,0),(w,30),(0,0,0),-1)
     
     imageBlob = cv2.dnn.blobFromImage(cv2.resize(frame,(300,300)),1.0, (300,300),(104.0,177.0,123.0), swapRB=False, crop=False)
     
@@ -89,12 +94,16 @@ while True:
         if change_status:
             face_image = cv2.GaussianBlur(face,(99,99), 30)
             frame[startY:endY, startX:endX] = face_image
-            cv2.putText(frame,'Blurred',(startX, startY+2),cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 200, 0),1)
+            cv2.rectangle(frame,(startX+2,startY-30),(startX+110,startY-2),(0,200,0),-3)
+
+            cv2.putText(frame,'Blurred',(startX, startY-10),cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255),1)
             cv2.putText(frame, 'Press s to unblur',(w-170,h-10),cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 200, 0),1)
             
-        else:
+        else:   
+            
             cv2.rectangle(frame, (startX, startY), (endX, endY),(0, 0, 255), 2)
-            cv2.putText(frame,'Not Blurred',(startX, startY+2),cv2.FONT_HERSHEY_COMPLEX, 0.8, (0, 200, 0),1)
+            cv2.rectangle(frame,(startX+2,startY-30),(startX+150,startY-2),(0,200,0),-3)
+            cv2.putText(frame,'Not Blurred',(startX, startY-10),cv2.FONT_HERSHEY_COMPLEX, 0.7, (255, 255, 255),1)
             cv2.putText(frame, 'Press s to blur',(w-170,h-10),cv2.FONT_HERSHEY_COMPLEX, 0.5, (0, 200, 0),1)
 
     if change_status:
@@ -104,11 +113,25 @@ while True:
         imgname = os.path.join(ROOT/('vid_rec/notblurred/'+str(uuid.uuid1())+'.jpg'))
 
     if cnt%100==0:
+        if change_status:
+            
+            blur_pic_count+=1
+        
+        else:
+            unblurred_pic_count+=1
         cv2.imwrite(imgname, frame)
+
+    cv2.putText(frame,'# {} Blurred {} Unblurred Image Saved'.format(blur_pic_count,unblurred_pic_count),
+                (0,h-10),cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255),1)
+
+    cv2.putText(frame,'Press Q to quit',(w-140,20),cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255),1)
+    cv2.putText(frame,'Face Detection Module',(10,20),cv2.FONT_HERSHEY_COMPLEX, 0.5, (255, 255, 255),1)
+
 
     cv2.imshow('Image Collection', frame)
         
     key = cv2.waitKey(1) & 0xFF
+
     
     if key == ord("q"):
         print('Video Saved, {} seconds recored'.format(round(time.time()-start)))
