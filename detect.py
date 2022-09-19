@@ -4,7 +4,7 @@ from imutils.video import FPS
 import numpy as np
 import imutils
 import time
-import cv2
+import cv2, pafy
 import os
 import uuid
 import argparse
@@ -21,7 +21,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument(
     '--source',
-    type=int,
+    type=str,
     default=0,
     help='Select Webcam'
 )
@@ -36,11 +36,21 @@ parser.add_argument(
     default=ROOT/'res10_300x300_ssd_iter_140000.caffemodel',
 )
 
+
+
 args = vars(parser.parse_args())
 
 detector = cv2.dnn.readNetFromCaffe(os.path.join(args['proto']), os.path.join(args['model']))
 
-cap=cv2.VideoCapture(args['source'])
+if args['source'].lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://')):
+    url=args['source']
+    video = pafy.new(url)
+    best  = video.getbest(preftype="mp4")
+
+    cap = cv2.VideoCapture(best.url)
+    frameRate = int(cap.get(cv2.CAP_PROP_FPS))
+else:
+    cap=cv2.VideoCapture(int(args['source']))
 
 fp = cap.get(cv2.CAP_PROP_FPS)
 w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
