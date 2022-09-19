@@ -5,8 +5,7 @@
 - Run capture_face.py to save image when face is detected from the video feed
 
 ```python
-$ python capture_face.py --source 0 # 1 if external cam is connected
-																		# Else Plug in youtube link
+$ python capture_face.py --source 0 # 1 if external cam is connected																		# Else Plug in youtube link
 ```
 
 - Press s to blur/unblur the video feed
