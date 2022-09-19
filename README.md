@@ -20,6 +20,6 @@ Blurred
 Unblurred
 
 * Courtesy of BTS 
-* 
+
 - Image, which will be saved to ./vid_rec/blurred/ or ./vid_rec/unblurred, depending on the status of bounding box, will be captured in every 5 seconds
 - Press Q to exit Face Detection program
